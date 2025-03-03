@@ -59,39 +59,20 @@ public class MainGUIController  {
         tableHandlers();
     }
 
-    private void tableHandlers(){
-        table1.setOnAction(event -> {
-            table1Orders.setTableNumber(1);
-            table1Orders.displayOrdersForm(service);
-        });
-        table2.setOnAction(event -> {
-            table2Orders.setTableNumber(2);
-            table2Orders.displayOrdersForm(service);
-        });
-        table3.setOnAction(event -> {
-            table3Orders.setTableNumber(3);
-            table3Orders.displayOrdersForm(service);
-        });
-        table4.setOnAction(event -> {
-            table4Orders.setTableNumber(4);
-            table4Orders.displayOrdersForm(service);
-        });
-        table5.setOnAction(event -> {
-            table5Orders.setTableNumber(5);
-            table5Orders.displayOrdersForm(service);
-        });
-        table6.setOnAction(event -> {
-            table6Orders.setTableNumber(6);
-            table6Orders.displayOrdersForm(service);
-        });
-        table7.setOnAction(event -> {
-            table7Orders.setTableNumber(7);
-            table7Orders.displayOrdersForm(service);
-        });
-        table8.setOnAction(event -> {
-            table8Orders.setTableNumber(8);
-            table8Orders.displayOrdersForm(service);
-        });
+    private void tableHandlers() {
+        Button[] tables = {table1, table2, table3, table4, table5, table6, table7, table8};
+        OrdersGUI[] orders = {table1Orders, table2Orders, table3Orders, table4Orders,
+                table5Orders, table6Orders, table7Orders, table8Orders};
+
+        for (int i = 0; i < tables.length; i++) {
+            final int index = i; // Variabilă auxiliară finală
+            final int tableNumber = index + 1;
+
+            tables[index].setOnAction(event -> {
+                orders[index].setTableNumber(tableNumber);
+                orders[index].displayOrdersForm(service);
+            });
+        }
 
     }
 

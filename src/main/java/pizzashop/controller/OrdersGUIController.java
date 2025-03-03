@@ -44,7 +44,7 @@ public class OrdersGUIController {
     @FXML
     private Button newOrder;
 
-    private   List<String> orderList = FXCollections.observableArrayList();
+    private ObservableList<String> orderList = FXCollections.observableArrayList();
     private List<Double> orderPaymentList = FXCollections.observableArrayList();
     public static double getTotalAmount() {
         return totalAmount;
@@ -77,14 +77,25 @@ public class OrdersGUIController {
         orderTable.setItems(menuData);
 
         //Controller for Place Order Button
-        placeOrder.setOnAction(event ->{
-            orderList= menuData.stream()
-                    .filter(x -> x.getQuantity()>0)
-                    .map(menuDataModel -> menuDataModel.getQuantity() +" "+ menuDataModel.getMenuItem())
+        placeOrder.setOnAction(event -> {
+            if (menuData == null || menuData.isEmpty()) {
+                System.out.println("Error: Menu data is not available.");
+                return;
+            }
+
+            List<String> validOrders = menuData.stream()
+                    .filter(x -> x.getQuantity() > 0)
+                    .map(menuDataModel -> menuDataModel.getQuantity() + " " + menuDataModel.getMenuItem())
                     .collect(Collectors.toList());
-            observableList = FXCollections.observableList(orderList);
-            KitchenGUIController.order.add("Table" + tableNumber +" "+ orderList.toString());
-            orderStatus.setText("Order placed at: " +  now.get(Calendar.HOUR)+":"+now.get(Calendar.MINUTE));
+
+            if (validOrders.isEmpty()) {
+                System.out.println("Error: No items selected for the order.");
+                return;
+            }
+
+            String formattedOrder = "Table " + tableNumber + ": " + String.join(", ", validOrders);
+            KitchenGUIController.order.add(formattedOrder);
+            orderStatus.setText("Order placed at: " + now.get(Calendar.HOUR) + ":" + now.get(Calendar.MINUTE));
         });
 
         //Controller for Order Served Button

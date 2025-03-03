@@ -61,7 +61,7 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(box));
         primaryStage.show();
         KitchenGUI kitchenGUI = new KitchenGUI();
-        kitchenGUI.KitchenGUI();
+        kitchenGUI.kitchenGUI();
     }
 
     public static void main(String[] args) { launch(args);

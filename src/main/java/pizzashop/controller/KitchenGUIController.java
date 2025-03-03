@@ -57,12 +57,35 @@ public class KitchenGUIController {
         //Controller for Ready Button
         ready.setOnAction(event -> {
             selectedOrder = kitchenOrdersList.getSelectionModel().getSelectedItem();
+
+            if (selectedOrder == null) {
+                System.out.println("Error: No order selected!");
+                return;
+            }
+
+            String orderString = selectedOrder.toString();
+
+            if (orderString.length() < 6 || !orderString.startsWith("Table")) {
+                System.out.println("Error: Invalid order format!");
+                return;
+            }
+
+            try {
+                extractedTableNumberString = orderString.substring(5, 6);
+                extractedTableNumberInteger = Integer.parseInt(extractedTableNumberString);
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Table number is not a valid integer.");
+                return;
+            }
+
             kitchenOrdersList.getItems().remove(selectedOrder);
-            extractedTableNumberString = selectedOrder.toString().subSequence(5, 6).toString();
-            extractedTableNumberInteger = Integer.valueOf(extractedTableNumberString);
+
+            String time = String.format("%02d:%02d", now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE));
             System.out.println("--------------------------");
-            System.out.println("Table " + extractedTableNumberInteger +" ready at: " + now.get(Calendar.HOUR)+":"+now.get(Calendar.MINUTE));
+            System.out.println("Table " + extractedTableNumberInteger + " ready at: " + time);
             System.out.println("--------------------------");
+
         });
+
     }
 }

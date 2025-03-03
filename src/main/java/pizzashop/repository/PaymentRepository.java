@@ -17,22 +17,33 @@ public class PaymentRepository {
         readPayments();
     }
 
-    private void readPayments(){
-        //ClassLoader classLoader = PaymentRepository.class.getClassLoader();
+    private void readPayments() {
         File file = new File(filename);
+
+        if (!file.exists()) {
+            System.err.println("Error: The payment file '" + filename + "' was not found. Creating a new empty file.");
+            return;
+        }
+
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = br.readLine()) != null) {
-                Payment payment = getPayment(line);
-                paymentList.add(payment);
+                try {
+                    Payment payment = getPayment(line);
+                    if (payment != null) {
+                        paymentList.add(payment);
+                    } else {
+                        System.err.println("Warning: Skipping invalid payment entry: " + line);
+                    }
+                } catch (NumberFormatException e) {
+                    System.err.println("Error: Invalid number format in payment entry: " + line);
+                }
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Error: Could not read from file '" + filename + "'. Please check file permissions.");
         }
-
     }
+
 
     private Payment getPayment(String line){
         Payment item=null;

@@ -19,32 +19,37 @@ public class OrdersGUI {
     public void setTableNumber(int tableNumber) { this.tableNumber = tableNumber; }
     private PizzaService service;
 
-    public void displayOrdersForm(PizzaService service){
-     VBox vBoxOrders = null;
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/OrdersGUIFXML.fxml"));
-
-            //vBoxOrders = FXMLLoader.load(getClass().getResource("/fxml/OrdersGUIFXML.fxml"));
-            vBoxOrders = loader.load();
-            OrdersGUIController ordersCtrl= loader.getController();
-            ordersCtrl.setService(service, tableNumber);
-
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void displayOrdersForm(PizzaService service) {
+        if (service == null) {
+            System.err.println("Error: Service cannot be null.");
+            return;
         }
 
-     Stage stage = new Stage();
-     stage.setTitle("Table"+getTableNumber()+" order form");
-     stage.setResizable(false);
-     // disable X on the window
-     stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-      @Override
-     public void handle(WindowEvent event) {
-         // consume event
-         event.consume();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/OrdersGUIFXML.fxml"));
+            VBox vBoxOrders = loader.load();
+
+            OrdersGUIController ordersCtrl = loader.getController();
+            if (ordersCtrl == null) {
+                throw new IllegalStateException("Error: OrdersGUIController could not be initialized.");
             }
-        });
-     stage.setScene(new Scene(vBoxOrders));
-     stage.show();
+
+            ordersCtrl.setService(service, tableNumber);
+
+            Stage stage = new Stage();
+            stage.setTitle("Table " + getTableNumber() + " order form");
+            stage.setResizable(false);
+
+            // Disable X button
+            stage.setOnCloseRequest(event -> event.consume());
+
+            stage.setScene(new Scene(vBoxOrders));
+            stage.show();
+
+        } catch (IOException e) {
+            System.err.println("Error loading Orders GUI: " + e.getMessage());
+        } catch (IllegalStateException e) {
+            System.err.println(e.getMessage());
+        }
     }
 }
