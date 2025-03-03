@@ -49,8 +49,8 @@ public class OrdersGUIController {
     public static double getTotalAmount() {
         return totalAmount;
     }
-    public void setTotalAmount(double totalAmount) {
-        this.totalAmount = totalAmount;
+    public static void setTotalAmount(double totalAmount) {
+        OrdersGUIController.totalAmount = totalAmount;
     }
 
     private PizzaService service;

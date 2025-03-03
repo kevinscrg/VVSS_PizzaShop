@@ -40,7 +40,7 @@ public class Main extends Application {
             public void handle(WindowEvent event) {
                 Alert exitAlert = new Alert(Alert.AlertType.CONFIRMATION, "Would you like to exit the Main window?", ButtonType.YES, ButtonType.NO);
                 Optional<ButtonType> result = exitAlert.showAndWait();
-                if (result.get() == ButtonType.YES){
+                if (result.isPresent() && result.get() == ButtonType.YES){
                     //Stage stage = (Stage) this.getScene().getWindow();
                     System.out.println("Incasari cash: "+service.getTotalAmount(PaymentType.Cash));
                     System.out.println("Incasari card: "+service.getTotalAmount(PaymentType.Card));
@@ -48,7 +48,7 @@ public class Main extends Application {
                     primaryStage.close();
                 }
                 // consume event
-                else if (result.get() == ButtonType.NO){
+                else if (result.isPresent() && result.get() == ButtonType.NO){
                     event.consume();
                 }
                 else {
