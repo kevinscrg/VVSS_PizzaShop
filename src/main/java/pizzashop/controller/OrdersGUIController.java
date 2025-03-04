@@ -13,6 +13,7 @@ import pizzashop.gui.OrdersGUI;
 import pizzashop.service.PaymentAlert;
 import pizzashop.service.PizzaService;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +48,7 @@ public class OrdersGUIController {
     private ObservableList<String> orderList = FXCollections.observableArrayList();
     private List<Double> orderPaymentList = FXCollections.observableArrayList();
     public static double getTotalAmount() {
-        return totalAmount;
+        return Math.round(totalAmount * 100.0) / 100.0;
     }
     public static void setTotalAmount(double totalAmount) {
         OrdersGUIController.totalAmount = totalAmount;
@@ -60,7 +61,10 @@ public class OrdersGUIController {
     private TableView<MenuDataModel> table = new TableView<MenuDataModel>();
     private ObservableList<MenuDataModel> menuData;// = FXCollections.observableArrayList();
     private Calendar now = Calendar.getInstance();
-    private static double totalAmount;
+    private static double totalAmount = 0;
+
+    private MenuDataModel selectedValue;
+    private final List<String> orderSummary = new ArrayList<>();
 
     public OrdersGUIController(){ }
 
@@ -95,7 +99,18 @@ public class OrdersGUIController {
 
             String formattedOrder = "Table " + tableNumber + ": " + String.join(", ", validOrders);
             KitchenGUIController.order.add(formattedOrder);
+            orderSummary.addAll(validOrders);
+            System.out.println(orderSummary);
             orderStatus.setText("Order placed at: " + now.get(Calendar.HOUR) + ":" + now.get(Calendar.MINUTE));
+
+            orderPaymentList= menuData.stream()
+                    .filter(x -> x.getQuantity()>0)
+                    .map(menuDataModel -> menuDataModel.getQuantity()*menuDataModel.getPrice())
+                    .collect(Collectors.toList());
+
+            setTotalAmount(orderPaymentList.stream().mapToDouble(e->e).sum() + getTotalAmount());
+
+            menuData.forEach(x -> x.setQuantity(0));
         });
 
         //Controller for Order Served Button
@@ -104,18 +119,13 @@ public class OrdersGUIController {
 
         //Controller for Pay Order Button
         payOrder.setOnAction(event -> {
-            orderPaymentList= menuData.stream()
-                    .filter(x -> x.getQuantity()>0)
-                    .map(menuDataModel -> menuDataModel.getQuantity()*menuDataModel.getPrice())
-                    .collect(Collectors.toList());
-            setTotalAmount(orderPaymentList.stream().mapToDouble(e->e.doubleValue()).sum());
             orderStatus.setText("Total amount: " + getTotalAmount());
             System.out.println("--------------------------");
             System.out.println("Table: " + tableNumber);
             System.out.println("Total: " + getTotalAmount());
             System.out.println("--------------------------");
             PaymentAlert pay = new PaymentAlert(service);
-            pay.showPaymentAlert(tableNumber, this.getTotalAmount());
+            pay.showPaymentAlert(tableNumber, getTotalAmount(), orderSummary);
         });
     }
 
@@ -135,6 +145,7 @@ public class OrdersGUIController {
         @Override
         public void changed(ObservableValue<? extends MenuDataModel> observable, MenuDataModel oldValue, MenuDataModel newValue) {
            pizzaTypeLabel.textProperty().bind(newValue.menuItemProperty());
+           selectedValue = newValue;
               }
         });
 
@@ -145,13 +156,7 @@ public class OrdersGUIController {
 
         //Controller for Add to order Button
         addToOrder.setOnAction(event -> {
-            orderTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<MenuDataModel>(){
-            @Override
-            public void changed(ObservableValue<? extends MenuDataModel> observable, MenuDataModel oldValue, MenuDataModel newValue){
-            oldValue.setQuantity(orderQuantity.getValue());
-            orderTable.getSelectionModel().selectedItemProperty().removeListener(this);
-                }
-            });
+            selectedValue.setQuantity(orderQuantity.getValue());
         });
 
         //Controller for Exit table Button

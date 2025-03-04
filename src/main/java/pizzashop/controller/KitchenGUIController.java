@@ -49,6 +49,16 @@ public class KitchenGUIController {
         //Controller for Cook Button
         cook.setOnAction(event -> {
             selectedOrder = kitchenOrdersList.getSelectionModel().getSelectedItem();
+
+            if (selectedOrder == null) {
+                System.out.println("Error: No order selected!");
+                return;
+            }
+            if(selectedOrder.toString().contains(" COOKING STARTED AT: ")) {
+                System.out.println("Error: order already completed!");
+                return;
+            }
+
             kitchenOrdersList.getItems().remove(selectedOrder);
             kitchenOrdersList.getItems().add(selectedOrder.toString()
                      .concat(" Cooking started at: ").toUpperCase()
@@ -65,13 +75,13 @@ public class KitchenGUIController {
 
             String orderString = selectedOrder.toString();
 
-            if (orderString.length() < 6 || !orderString.startsWith("Table")) {
+            if (orderString.length() < 6 || !orderString.startsWith("TABLE")) {
                 System.out.println("Error: Invalid order format!");
                 return;
             }
 
             try {
-                extractedTableNumberString = orderString.substring(5, 6);
+                extractedTableNumberString = orderString.substring(6,7);
                 extractedTableNumberInteger = Integer.parseInt(extractedTableNumberString);
             } catch (NumberFormatException e) {
                 System.out.println("Error: Table number is not a valid integer.");

@@ -4,6 +4,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import pizzashop.model.PaymentType;
 
+import java.util.List;
 import java.util.Optional;
 
 public class PaymentAlert implements PaymentOperation {
@@ -33,10 +34,10 @@ public class PaymentAlert implements PaymentOperation {
         System.out.println("Payment choice needed...");
         System.out.println("--------------------------");
     }
-      public void showPaymentAlert(int tableNumber, double totalAmount ) {
+      public void showPaymentAlert(int tableNumber, double totalAmount, List<String> orderSummary) {
         Alert paymentAlert = new Alert(Alert.AlertType.CONFIRMATION);
         paymentAlert.setTitle("Payment for Table "+tableNumber);
-        paymentAlert.setHeaderText("Total amount: " + totalAmount);
+        paymentAlert.setHeaderText(String.join("\n", orderSummary) +"\n-------\n" + "Total amount: " + totalAmount);
         paymentAlert.setContentText("Please choose payment option");
         ButtonType cardPayment = new ButtonType("Pay by Card");
         ButtonType cashPayment = new ButtonType("Pay Cash");
