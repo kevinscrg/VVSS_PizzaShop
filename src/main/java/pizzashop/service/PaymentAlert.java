@@ -34,7 +34,7 @@ public class PaymentAlert implements PaymentOperation {
         System.out.println("Payment choice needed...");
         System.out.println("--------------------------");
     }
-      public void showPaymentAlert(int tableNumber, double totalAmount, List<String> orderSummary) {
+      public void showPaymentAlert(int tableNumber, double totalAmount, List<String> orderSummary) throws PaymentException {
         Alert paymentAlert = new Alert(Alert.AlertType.CONFIRMATION);
         paymentAlert.setTitle("Payment for Table "+tableNumber);
         paymentAlert.setHeaderText(String.join("\n", orderSummary) +"\n-------\n" + "Total amount: " + totalAmount);
@@ -47,9 +47,23 @@ public class PaymentAlert implements PaymentOperation {
         Optional<ButtonType> result = paymentAlert.showAndWait();
         result.ifPresent(selected -> {
             if (selected == cardPayment) {
+                if(tableNumber < 1 || tableNumber > 8){
+                    try {
+                        throw new PaymentException("table number not valid");
+                    } catch (PaymentException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
                 cardPayment();
                 service.addPayment(tableNumber, PaymentType.Card, totalAmount);
             } else if (selected == cashPayment) {
+                if(tableNumber < 1 || tableNumber > 8){
+                    try {
+                        throw new PaymentException("table number not valid");
+                    } catch (PaymentException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
                 cashPayment();
                 service.addPayment(tableNumber, PaymentType.Cash, totalAmount);
             } else {

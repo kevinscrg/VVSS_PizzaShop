@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import pizzashop.model.MenuDataModel;
 import pizzashop.gui.OrdersGUI;
 import pizzashop.service.PaymentAlert;
+import pizzashop.service.PaymentException;
 import pizzashop.service.PizzaService;
 
 import java.util.ArrayList;
@@ -125,7 +126,11 @@ public class OrdersGUIController {
             System.out.println("Total: " + getTotalAmount());
             System.out.println("--------------------------");
             PaymentAlert pay = new PaymentAlert(service);
-            pay.showPaymentAlert(tableNumber, getTotalAmount(), orderSummary);
+            try {
+                pay.showPaymentAlert(tableNumber, getTotalAmount(), orderSummary);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         });
     }
 
