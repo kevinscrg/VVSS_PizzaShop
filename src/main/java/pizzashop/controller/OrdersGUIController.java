@@ -22,29 +22,29 @@ import java.util.stream.Collectors;
 
 public class OrdersGUIController {
     @FXML
-    private ComboBox<Integer> orderQuantity;
+    protected ComboBox<Integer> orderQuantity;
     @FXML
-    private TableView orderTable;
+    protected TableView orderTable;
     @FXML
-    private TableColumn tableQuantity;
+    protected TableColumn tableQuantity;
     @FXML
     protected TableColumn tableMenuItem;
     @FXML
-    private TableColumn tablePrice;
+    protected TableColumn tablePrice;
     @FXML
-    private Label pizzaTypeLabel;
+    protected Label pizzaTypeLabel;
     @FXML
-    private Button addToOrder;
+    protected Button addToOrder;
     @FXML
-    private Label orderStatus;
+    protected Label orderStatus;
     @FXML
-    private Button placeOrder;
+    protected Button placeOrder;
     @FXML
-    private Button orderServed;
+    protected Button orderServed;
     @FXML
-    private Button payOrder;
+    protected Button payOrder;
     @FXML
-    private Button newOrder;
+    protected Button newOrder;
 
     private ObservableList<String> orderList = FXCollections.observableArrayList();
     private List<Double> orderPaymentList = FXCollections.observableArrayList();
@@ -65,18 +65,24 @@ public class OrdersGUIController {
     private static double totalAmount = 0;
 
     private MenuDataModel selectedValue;
-    private final List<String> orderSummary = new ArrayList<>();
+    protected final List<String> orderSummary = new ArrayList<>();
 
     public OrdersGUIController(){ }
 
     public void setService(PizzaService service, int tableNumber){
         this.service=service;
         this.tableNumber=tableNumber;
-        initData();
+        try {
+            initData();
+            setTotalAmount(0);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
 
     }
 
-    private void initData(){
+    private void initData() throws Exception{
         menuData = FXCollections.observableArrayList(service.getMenuData());
         menuData.setAll(service.getMenuData());
         orderTable.setItems(menuData);
@@ -84,8 +90,8 @@ public class OrdersGUIController {
         //Controller for Place Order Button
         placeOrder.setOnAction(event -> {
             if (menuData == null || menuData.isEmpty()) {
-                System.out.println("Error: Menu data is not available.");
-                return;
+                throw new RuntimeException("Error: Menu data is not available.");
+
             }
 
             List<String> validOrders = menuData.stream()
@@ -169,7 +175,11 @@ public class OrdersGUIController {
             Alert exitAlert = new Alert(Alert.AlertType.CONFIRMATION, "Exit table?",ButtonType.YES, ButtonType.NO);
             Optional<ButtonType> result = exitAlert.showAndWait();
             if (result.get() == ButtonType.YES){
+
                 Stage stage = (Stage) newOrder.getScene().getWindow();
+
+                OrdersGUI.removeTableFromOpenTables(tableNumber);
+
                 stage.close();
                 }
         });
