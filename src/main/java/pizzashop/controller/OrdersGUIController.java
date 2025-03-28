@@ -99,25 +99,8 @@ public class OrdersGUIController {
                     .map(menuDataModel -> menuDataModel.getQuantity() + " " + menuDataModel.getMenuItem())
                     .collect(Collectors.toList());
 
-            if (validOrders.isEmpty()) {
-                System.out.println("Error: No items selected for the order.");
-                return;
-            }
+            placeOrder(validOrders);
 
-            String formattedOrder = "Table " + tableNumber + ": " + String.join(", ", validOrders);
-            KitchenGUIController.order.add(formattedOrder);
-            orderSummary.addAll(validOrders);
-            System.out.println(orderSummary);
-            orderStatus.setText("Order placed at: " + now.get(Calendar.HOUR) + ":" + now.get(Calendar.MINUTE));
-
-            orderPaymentList= menuData.stream()
-                    .filter(x -> x.getQuantity()>0)
-                    .map(menuDataModel -> menuDataModel.getQuantity()*menuDataModel.getPrice())
-                    .collect(Collectors.toList());
-
-            setTotalAmount(orderPaymentList.stream().mapToDouble(e->e).sum() + getTotalAmount());
-
-            menuData.forEach(x -> x.setQuantity(0));
         });
 
         //Controller for Order Served Button
@@ -138,6 +121,41 @@ public class OrdersGUIController {
                 System.out.println(e.getMessage());
             }
         });
+    }
+
+    public void placeOrder(List<String> validOrders){
+
+        if (validOrders.isEmpty()) {
+            throw new RuntimeException("Error: Menu data is not available.");
+        }
+
+        boolean allQuantitiesPositive = validOrders.stream()
+                .map(order -> order.split(" ")[0]) // extrage cantitatea
+                .mapToInt(Integer::parseInt)
+                .allMatch(qty -> qty > 0);
+
+        if (!allQuantitiesPositive) {
+            System.out.println("Error: No items selected for the order.");
+            return;
+        }
+
+
+
+        String formattedOrder = "Table " + tableNumber + ": " + String.join(", ", validOrders);
+        KitchenGUIController.order.add(formattedOrder);
+        orderSummary.addAll(validOrders);
+        System.out.println(orderSummary);
+        orderStatus.setText("Order placed at: " + now.get(Calendar.HOUR) + ":" + now.get(Calendar.MINUTE));
+
+        orderPaymentList= menuData.stream()
+                .filter(x -> x.getQuantity()>0)
+                .map(menuDataModel -> menuDataModel.getQuantity()*menuDataModel.getPrice())
+                .collect(Collectors.toList());
+
+        setTotalAmount(orderPaymentList.stream().mapToDouble(e->e).sum() + getTotalAmount());
+
+        menuData.forEach(x -> x.setQuantity(0));
+
     }
 
     public void initialize(){

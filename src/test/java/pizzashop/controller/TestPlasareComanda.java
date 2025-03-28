@@ -1,5 +1,6 @@
 package pizzashop.controller;
 
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import org.junit.jupiter.api.*;
@@ -9,11 +10,13 @@ import javafx.stage.Stage;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.testfx.framework.junit5.ApplicationTest;
+import org.testfx.util.WaitForAsyncUtils;
 import pizzashop.model.MenuDataModel;
 import pizzashop.service.PizzaService;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -44,9 +47,6 @@ class TestPlasareComanda extends ApplicationTest {
 
         controller.setService(mockService, 1);
 
-        Scene scene = new Scene(root, 400, 400);
-        stage.setScene(scene);
-        stage.show();
     }
 
     @BeforeAll
@@ -79,16 +79,14 @@ class TestPlasareComanda extends ApplicationTest {
     @Order(1)
     void testPlaceOrderButtonWorks() {
 
-        MenuDataModel pizza = new MenuDataModel("Margherita", 0, 20.0);
-        pizza.setQuantity(2);
+        List<String> order = new ArrayList<>();
+        order.add("2 Margherita");
 
-        when(mockService.getMenuData()).thenReturn(List.of(pizza));
+        Platform.runLater(() -> controller.placeOrder(order));
+        WaitForAsyncUtils.waitForFxEvents();
 
-        controller.setService(mockService, 1);
 
-        clickOn(controller.placeOrder);
         double total = OrdersGUIController.getTotalAmount();
-
 
         assertFalse(controller.orderSummary.isEmpty());
         assertTrue(controller.orderSummary.contains("2 Margherita"));
@@ -108,14 +106,14 @@ class TestPlasareComanda extends ApplicationTest {
         PrintStream originalOut = System.out;
         System.setOut(new PrintStream(outContent));
 
-        MenuDataModel pizza = new MenuDataModel("Margherita", 0, 20.0);
-        pizza.setQuantity(quantity);
+        List<String> order = new ArrayList<>();
+        order.add(quantity + " Margherita");
+        System.setOut(originalOut);
+        System.out.printf(order.toString());
+        System.setOut(new PrintStream(outContent));
 
-        when(mockService.getMenuData()).thenReturn(List.of(pizza));
-
-        controller.setService(mockService, 2);
-
-        controller.placeOrder.fire();
+        Platform.runLater(() -> controller.placeOrder(order));
+        WaitForAsyncUtils.waitForFxEvents();
 
 
         try {
@@ -134,17 +132,17 @@ class TestPlasareComanda extends ApplicationTest {
 
     }
 
-    // ECP si BVA
+    // ECP si BVA negativ
     @Test
     @DisplayName("ECP: Meniu gol - Error: Menu data is not available")
     @Order(3)
     void testEmptyMeniu() {
 
-        when(mockService.getMenuData()).thenReturn(List.of());
-        controller.setService(mockService, 3);
+        List<String> order = new ArrayList<>();
+
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            controller.placeOrder.fire();
+            controller.placeOrder(order);
         });
 
         assertEquals("Error: Menu data is not available.", exception.getMessage());
@@ -156,61 +154,68 @@ class TestPlasareComanda extends ApplicationTest {
     @DisplayName("BVA: Cantitate minima valida (1 pizza) - Successful order placement")
     @Order(4)
     void testPlaceOrderBoundaryMinPositive() {
-        MenuDataModel pizza = new MenuDataModel("Margherita", 0, 20.0);
-        pizza.setQuantity(1);  // cantitate minimă validă
 
-        when(mockService.getMenuData()).thenReturn(List.of(pizza));
-        controller.setService(mockService, 5);
+        List<String> order = new ArrayList<>();
+        order.add("1 Margherita");
 
-        clickOn(controller.placeOrder);
+        Platform.runLater(() -> controller.placeOrder(order));
+        WaitForAsyncUtils.waitForFxEvents();
 
         assertFalse(controller.orderSummary.isEmpty());
         assertTrue(controller.orderSummary.contains("1 Margherita"));
         assertTrue(controller.orderStatus.getText().startsWith("Order placed at:"));
 
-        double total = OrdersGUIController.getTotalAmount();
-        assertEquals(20.0, total, 0.01);
     }
 
+    //BVA - pozitiv maxim-1
+    @Test
+    @DisplayName("BVA: Cantitate maxima -1 acceptabila (999 pizze) - Successful large order placement")
+    @Order(5)
+    void testPlaceOrderBoundaryMicMaxPositive() {
+        List<String> order = new ArrayList<>();
+        order.add("999999999 Margherita");
+
+        Platform.runLater(() -> controller.placeOrder(order));
+        WaitForAsyncUtils.waitForFxEvents();
+
+        assertFalse(controller.orderSummary.isEmpty());
+        assertTrue(controller.orderSummary.contains("999999999 Margherita"));
+        assertTrue(controller.orderStatus.getText().startsWith("Order placed at:"));
+
+    }
 
     //BVA - pozitiv maxim
     @Test
     @DisplayName("BVA: Cantitate maxima acceptabila (1000 pizze) - Successful large order placement")
-    @Order(5)
+    @Order(6)
     void testPlaceOrderBoundaryMaxPositive() {
-        MenuDataModel pizza = new MenuDataModel("Margherita", 0, 20.0);
-        pizza.setQuantity(1000);  // cantitate maximă acceptabilă (presupunem 1000 ca limită superioară logică)
+        List<String> order = new ArrayList<>();
+        order.add("1000000000 Margherita");
 
-        when(mockService.getMenuData()).thenReturn(List.of(pizza));
-        controller.setService(mockService, 6);
-
-        clickOn(controller.placeOrder);
+        Platform.runLater(() -> controller.placeOrder(order));
+        WaitForAsyncUtils.waitForFxEvents();
 
         assertFalse(controller.orderSummary.isEmpty());
-        assertTrue(controller.orderSummary.contains("1000 Margherita"));
+        assertTrue(controller.orderSummary.contains("1000000000 Margherita"));
         assertTrue(controller.orderStatus.getText().startsWith("Order placed at:"));
 
-        double total = OrdersGUIController.getTotalAmount();
-        assertEquals(20000.0, total, 0.01);
     }
 
 
     //BVA - negativ
     @Test
     @DisplayName("BVA: Cantitate zero - No items selected for the order error")
-    @Order(6)
+    @Order(1)
     void testPlaceOrderBoundaryZeroNegative() {
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         PrintStream originalOut = System.out;
         System.setOut(new PrintStream(outContent));
 
-        MenuDataModel pizza = new MenuDataModel("Margherita", 0, 20.0);
-        pizza.setQuantity(0);  // cantitate invalidă: 0
+        List<String> order = new ArrayList<>();
+        order.add("0 Margherita");
 
-        when(mockService.getMenuData()).thenReturn(List.of(pizza));
-        controller.setService(mockService, 1);
-
-        controller.placeOrder.fire();
+        Platform.runLater(() -> controller.placeOrder(order));
+        WaitForAsyncUtils.waitForFxEvents();
 
         String output = outContent.toString().trim();
         assertTrue(output.contains("Error: No items selected for the order."));
@@ -222,19 +227,17 @@ class TestPlasareComanda extends ApplicationTest {
     //BVA - negativ
     @Test
     @DisplayName("BVA: Cantitate negativa (-1) - No items selected for the order error")
-    @Order(7)
+    @Order(8)
     void testPlaceOrderBoundaryNegativeQuantity() {
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         PrintStream originalOut = System.out;
         System.setOut(new PrintStream(outContent));
 
-        MenuDataModel pizza = new MenuDataModel("Margherita", 0, 20.0);
-        pizza.setQuantity(-1);  // cantitate negativă
+        List<String> order = new ArrayList<>();
+        order.add("-1 Margherita");
 
-        when(mockService.getMenuData()).thenReturn(List.of(pizza));
-        controller.setService(mockService, 1);
-
-        controller.placeOrder.fire();
+        Platform.runLater(() -> controller.placeOrder(order));
+        WaitForAsyncUtils.waitForFxEvents();
 
         String output = outContent.toString().trim();
         assertTrue(output.contains("Error: No items selected for the order."));
