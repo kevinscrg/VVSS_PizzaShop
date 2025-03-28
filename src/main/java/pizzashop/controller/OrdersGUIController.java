@@ -99,7 +99,7 @@ public class OrdersGUIController {
                     .map(menuDataModel -> menuDataModel.getQuantity() + " " + menuDataModel.getMenuItem())
                     .collect(Collectors.toList());
 
-            placeOrder(validOrders);
+            placeOrder(validOrders, (MenuDataModel) menuData);
 
         });
 
@@ -123,14 +123,14 @@ public class OrdersGUIController {
         });
     }
 
-    public void placeOrder(List<String> validOrders){
+    public void placeOrder(List<String> order, MenuDataModel menu){
 
-        if (validOrders.isEmpty()) {
+        if (menu == null) {
             throw new RuntimeException("Error: Menu data is not available.");
         }
 
-        boolean allQuantitiesPositive = validOrders.stream()
-                .map(order -> order.split(" ")[0]) // extrage cantitatea
+        boolean allQuantitiesPositive = order.stream()
+                .map(o -> o.split(" ")[0]) // extrage cantitatea
                 .mapToInt(Integer::parseInt)
                 .allMatch(qty -> qty > 0);
 
@@ -141,9 +141,9 @@ public class OrdersGUIController {
 
 
 
-        String formattedOrder = "Table " + tableNumber + ": " + String.join(", ", validOrders);
+        String formattedOrder = "Table " + tableNumber + ": " + String.join(", ", order);
         KitchenGUIController.order.add(formattedOrder);
-        orderSummary.addAll(validOrders);
+        orderSummary.addAll(order);
         System.out.println(orderSummary);
         orderStatus.setText("Order placed at: " + now.get(Calendar.HOUR) + ":" + now.get(Calendar.MINUTE));
 

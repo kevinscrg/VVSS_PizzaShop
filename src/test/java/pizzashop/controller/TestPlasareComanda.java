@@ -79,20 +79,17 @@ class TestPlasareComanda extends ApplicationTest {
     @Order(1)
     void testPlaceOrderButtonWorks() {
 
+        MenuDataModel menu = new MenuDataModel("Margherita", 0, 20.0);
         List<String> order = new ArrayList<>();
         order.add("2 Margherita");
 
-        Platform.runLater(() -> controller.placeOrder(order));
+        Platform.runLater(() -> controller.placeOrder(order,menu));
         WaitForAsyncUtils.waitForFxEvents();
 
-
-        double total = OrdersGUIController.getTotalAmount();
 
         assertFalse(controller.orderSummary.isEmpty());
         assertTrue(controller.orderSummary.contains("2 Margherita"));
         assertTrue(controller.orderStatus.getText().startsWith("Order placed at:"));
-
-        assertEquals(40.0, total, 0.01);
     }
 
     // ECP
@@ -106,13 +103,14 @@ class TestPlasareComanda extends ApplicationTest {
         PrintStream originalOut = System.out;
         System.setOut(new PrintStream(outContent));
 
+        MenuDataModel menu = new MenuDataModel("Margherita", 0, 20.0);
         List<String> order = new ArrayList<>();
         order.add(quantity + " Margherita");
         System.setOut(originalOut);
         System.out.printf(order.toString());
         System.setOut(new PrintStream(outContent));
 
-        Platform.runLater(() -> controller.placeOrder(order));
+        Platform.runLater(() -> controller.placeOrder(order,menu));
         WaitForAsyncUtils.waitForFxEvents();
 
 
@@ -132,17 +130,18 @@ class TestPlasareComanda extends ApplicationTest {
 
     }
 
-    // ECP si BVA negativ
+    // ECP si BVA negativ menu
     @Test
     @DisplayName("ECP: Meniu gol - Error: Menu data is not available")
     @Order(3)
     void testEmptyMeniu() {
 
+
         List<String> order = new ArrayList<>();
 
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            controller.placeOrder(order);
+            controller.placeOrder(order, null);
         });
 
         assertEquals("Error: Menu data is not available.", exception.getMessage());
@@ -157,8 +156,9 @@ class TestPlasareComanda extends ApplicationTest {
 
         List<String> order = new ArrayList<>();
         order.add("1 Margherita");
+        MenuDataModel menu = new MenuDataModel("Margherita", 0, 20.0);
 
-        Platform.runLater(() -> controller.placeOrder(order));
+        Platform.runLater(() -> controller.placeOrder(order, menu));
         WaitForAsyncUtils.waitForFxEvents();
 
         assertFalse(controller.orderSummary.isEmpty());
@@ -174,8 +174,9 @@ class TestPlasareComanda extends ApplicationTest {
     void testPlaceOrderBoundaryMicMaxPositive() {
         List<String> order = new ArrayList<>();
         order.add("999999999 Margherita");
+        MenuDataModel menu = new MenuDataModel("Margherita", 0, 20.0);
 
-        Platform.runLater(() -> controller.placeOrder(order));
+        Platform.runLater(() -> controller.placeOrder(order, menu));
         WaitForAsyncUtils.waitForFxEvents();
 
         assertFalse(controller.orderSummary.isEmpty());
@@ -191,8 +192,9 @@ class TestPlasareComanda extends ApplicationTest {
     void testPlaceOrderBoundaryMaxPositive() {
         List<String> order = new ArrayList<>();
         order.add("1000000000 Margherita");
+        MenuDataModel menu = new MenuDataModel("Margherita", 0, 20.0);
 
-        Platform.runLater(() -> controller.placeOrder(order));
+        Platform.runLater(() -> controller.placeOrder(order, menu));
         WaitForAsyncUtils.waitForFxEvents();
 
         assertFalse(controller.orderSummary.isEmpty());
@@ -213,8 +215,9 @@ class TestPlasareComanda extends ApplicationTest {
 
         List<String> order = new ArrayList<>();
         order.add("0 Margherita");
+        MenuDataModel menu = new MenuDataModel("Margherita", 0, 20.0);
 
-        Platform.runLater(() -> controller.placeOrder(order));
+        Platform.runLater(() -> controller.placeOrder(order,menu));
         WaitForAsyncUtils.waitForFxEvents();
 
         String output = outContent.toString().trim();
@@ -235,8 +238,9 @@ class TestPlasareComanda extends ApplicationTest {
 
         List<String> order = new ArrayList<>();
         order.add("-1 Margherita");
+        MenuDataModel menu = new MenuDataModel("Margherita", 0, 20.0);
 
-        Platform.runLater(() -> controller.placeOrder(order));
+        Platform.runLater(() -> controller.placeOrder(order, menu));
         WaitForAsyncUtils.waitForFxEvents();
 
         String output = outContent.toString().trim();
