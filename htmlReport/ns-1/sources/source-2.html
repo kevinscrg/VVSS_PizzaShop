@@ -1,0 +1,198 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > PaymentRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">pizzashop.repository</a>
+</div>
+
+<h1>Coverage Summary for Class: PaymentRepository (pizzashop.repository)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PaymentRepository</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    71,4%
+  </span>
+  <span class="absValue">
+    (5/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (12/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    69,8%
+  </span>
+  <span class="absValue">
+    (30/43)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package pizzashop.repository;
+&nbsp;
+&nbsp;import pizzashop.model.Payment;
+&nbsp;import pizzashop.model.PaymentType;
+&nbsp;
+&nbsp;import java.io.*;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.StringTokenizer;
+&nbsp;
+&nbsp;public class PaymentRepository {
+<b class="fc">&nbsp;    private String filename = &quot;data/payments.txt&quot;;</b>
+&nbsp;    private List&lt;Payment&gt; paymentList;
+&nbsp;
+<b class="nc">&nbsp;    public PaymentRepository(){</b>
+<b class="nc">&nbsp;        this.paymentList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        readPayments();</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public PaymentRepository(String filename){</b>
+<b class="fc">&nbsp;        this.paymentList = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        this.filename = filename;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void readPayments() {
+<b class="fc">&nbsp;        File file = new File(filename);</b>
+<b class="fc">&nbsp;        if (!file.exists()) {</b>
+<b class="fc">&nbsp;            System.err.println(&quot;Error: The payment file &#39;&quot; + filename + &quot;&#39; was not found. Creating a new empty file.&quot;);return;}</b>
+<b class="fc">&nbsp;        try (BufferedReader br = new BufferedReader(new FileReader(file))) {String line;</b>
+<b class="fc">&nbsp;            while ((line = br.readLine()) != null) {</b>
+<b class="fc">&nbsp;                line = line.trim();</b>
+<b class="fc">&nbsp;                if (line.isEmpty()) {</b>
+<b class="fc">&nbsp;                    System.out.println(&quot;Warning: Skipping empty line.&quot;);continue;}</b>
+<b class="fc">&nbsp;                try {Payment payment = getPayment(line);</b>
+<b class="fc">&nbsp;                    if (payment != null) {</b>
+<b class="fc">&nbsp;                        paymentList.add(payment);</b>
+<b class="fc">&nbsp;                    } else {System.out.println(&quot;Warning: Skipping invalid payment entry: &quot; + line);}</b>
+<b class="fc">&nbsp;                } catch (NumberFormatException e) {</b>
+<b class="fc">&nbsp;                    System.out.println(&quot;Error: Invalid number format in payment entry: &quot; + line);}}</b>
+<b class="fc">&nbsp;        } catch (IOException e) {</b>
+<b class="fc">&nbsp;            System.out.println(&quot;Error: Could not read from file &#39;&quot; + filename + &quot;&#39;. Please check file permissions.&quot;);}}</b>
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    private Payment getPayment(String line){
+<b class="fc">&nbsp;        Payment item=null;</b>
+<b class="pc">&nbsp;        if (line==null|| line.equals(&quot;&quot;)) return null;</b>
+<b class="fc">&nbsp;        StringTokenizer st=new StringTokenizer(line, &quot;,&quot;);</b>
+<b class="fc">&nbsp;        int tableNumber= Integer.parseInt(st.nextToken());</b>
+<b class="fc">&nbsp;        if (tableNumber&lt;1) return null;</b>
+<b class="fc">&nbsp;        String type= st.nextToken();</b>
+<b class="fc">&nbsp;        double amount = Double.parseDouble(st.nextToken());</b>
+<b class="fc">&nbsp;        item = new Payment(tableNumber, PaymentType.valueOf(type), amount);</b>
+<b class="fc">&nbsp;        return item;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void add(Payment payment){
+<b class="nc">&nbsp;        paymentList.add(payment);</b>
+<b class="nc">&nbsp;        writeAll();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;Payment&gt; getAll(){
+<b class="fc">&nbsp;        return paymentList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void writeAll(){
+&nbsp;        //ClassLoader classLoader = PaymentRepository.class.getClassLoader();
+<b class="nc">&nbsp;        File file = new File(filename);</b>
+&nbsp;
+<b class="nc">&nbsp;        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {</b>
+<b class="nc">&nbsp;            for (Payment p : paymentList) {</b>
+<b class="nc">&nbsp;                System.out.println(p.toString());</b>
+<b class="nc">&nbsp;                bw.write(p.toString());</b>
+<b class="nc">&nbsp;                bw.newLine();</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            e.printStackTrace();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-06 17:10</div>
+</div>
+</body>
+</html>

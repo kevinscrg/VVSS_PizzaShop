@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 public class PaymentRepository {
-    private static String filename = "data/payments.txt";
+    private String filename = "data/payments.txt";
     private List<Payment> paymentList;
 
     public PaymentRepository(){
@@ -17,32 +17,29 @@ public class PaymentRepository {
         readPayments();
     }
 
-    private void readPayments() {
+    public PaymentRepository(String filename){
+        this.paymentList = new ArrayList<>();
+        this.filename = filename;
+    }
+
+    public void readPayments() {
         File file = new File(filename);
-
         if (!file.exists()) {
-            System.err.println("Error: The payment file '" + filename + "' was not found. Creating a new empty file.");
-            return;
-        }
-
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String line;
+            System.err.println("Error: The payment file '" + filename + "' was not found. Creating a new empty file.");return;}
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {String line;
             while ((line = br.readLine()) != null) {
-                try {
-                    Payment payment = getPayment(line);
+                line = line.trim();
+                if (line.isEmpty()) {
+                    System.out.println("Warning: Skipping empty line.");continue;}
+                try {Payment payment = getPayment(line);
                     if (payment != null) {
                         paymentList.add(payment);
-                    } else {
-                        System.err.println("Warning: Skipping invalid payment entry: " + line);
-                    }
+                    } else {System.out.println("Warning: Skipping invalid payment entry: " + line);}
                 } catch (NumberFormatException e) {
-                    System.err.println("Error: Invalid number format in payment entry: " + line);
-                }
-            }
+                    System.out.println("Error: Invalid number format in payment entry: " + line);}}
         } catch (IOException e) {
-            System.err.println("Error: Could not read from file '" + filename + "'. Please check file permissions.");
-        }
-    }
+            System.out.println("Error: Could not read from file '" + filename + "'. Please check file permissions.");}}
+
 
 
     private Payment getPayment(String line){
@@ -50,6 +47,7 @@ public class PaymentRepository {
         if (line==null|| line.equals("")) return null;
         StringTokenizer st=new StringTokenizer(line, ",");
         int tableNumber= Integer.parseInt(st.nextToken());
+        if (tableNumber<1) return null;
         String type= st.nextToken();
         double amount = Double.parseDouble(st.nextToken());
         item = new Payment(tableNumber, PaymentType.valueOf(type), amount);
