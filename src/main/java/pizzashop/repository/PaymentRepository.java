@@ -38,7 +38,9 @@ public class PaymentRepository {
                 } catch (NumberFormatException e) {
                     System.out.println("Error: Invalid number format in payment entry: " + line);}}
         } catch (IOException e) {
-            System.out.println("Error: Could not read from file '" + filename + "'. Please check file permissions.");}}
+            System.out.println("Error: Could not read from file '" + filename + "'. Please check file permissions.");}
+        System.out.println(paymentList.toString());}
+
 
 
 
