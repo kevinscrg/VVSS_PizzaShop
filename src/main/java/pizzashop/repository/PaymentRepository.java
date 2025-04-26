@@ -22,8 +22,7 @@ public class PaymentRepository {
         this.filename = filename;
     }
 
-    public void readPayments() {
-        File file = new File(filename);
+    public void readPayments() {File file = new File(filename);
         if (!file.exists()) {
             System.err.println("Error: The payment file '" + filename + "' was not found. Creating a new empty file.");return;}
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {String line;
