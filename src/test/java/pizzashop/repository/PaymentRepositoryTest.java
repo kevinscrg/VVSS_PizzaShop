@@ -77,7 +77,7 @@ class PaymentRepositoryTest {
     void testPath03_loopCoverageMultipleLines() throws IOException {
         String content = String.join("\n",
                 "1,Cash,10.0",
-                "-1, Cash ,12.5",
+                "-1,Cash,12.5",
                 " ",
                 "table,Card,30.0"
         );

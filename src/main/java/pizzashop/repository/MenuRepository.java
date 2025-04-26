@@ -8,10 +8,14 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 public class MenuRepository {
-    private static String filename = "data/menu.txt";
+    private String filename = "data/menu.txt";
     private List<MenuDataModel> listMenu;
 
     public MenuRepository(){
+    }
+
+    public MenuRepository(String filename){
+        this.filename = filename;
     }
 
     private void readMenu(){
@@ -31,7 +35,7 @@ public class MenuRepository {
         }
     }
 
-    private MenuDataModel getMenuItem(String line){
+    public MenuDataModel getMenuItem(String line){
         MenuDataModel item=null;
         if (line==null|| line.equals("")) return null;
         StringTokenizer st=new StringTokenizer(line, ",");
