@@ -56,7 +56,7 @@ class TestPlasareComanda {
     }
 
     // --- TESTE ---
-
+    @Test
     @DisplayName("ECP: Plasare comanda valida")
     @Order(1)
     void testPlaceOrderButtonWorks() {
@@ -72,7 +72,7 @@ class TestPlasareComanda {
 
     }
 
-
+    @Test
     @DisplayName("ECP: Comanda fara produse selectate - No items selected for the order")
     @Order(2)
     void testPlaceOrderButtonFails() {
