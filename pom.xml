@@ -127,8 +127,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.22.1</version>
         <configuration>
-          <argLine>--add-opens pizzashop/pizzashop.repository=ALL-UNNAMED</argLine>
-          <argLine>--add-opens pizzashop/pizzashop.controller=ALL-UNNAMED</argLine>
+          <!--                <failIfNoTests>false</failIfNoTests>-->
         </configuration>
       </plugin>
       <plugin>
