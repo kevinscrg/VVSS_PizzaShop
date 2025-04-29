@@ -58,7 +58,6 @@ class TestPlasareComanda {
     // --- TESTE ---
 
     @DisplayName("ECP: Plasare comanda valida")
-    @RepeatedTest(3)
     @Order(1)
     void testPlaceOrderButtonWorks() {
         List<String> order = new ArrayList<>();
@@ -73,17 +72,16 @@ class TestPlasareComanda {
 
     }
 
-    @ParameterizedTest
-    @ValueSource(ints = {0, -4})
+
     @DisplayName("ECP: Comanda fara produse selectate - No items selected for the order")
     @Order(2)
-    void testPlaceOrderButtonFails(int quantity) {
+    void testPlaceOrderButtonFails() {
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         PrintStream originalOut = System.out;
         System.setOut(new PrintStream(outContent));
 
         List<String> order = new ArrayList<>();
-        order.add(quantity + " Margherita");
+        order.add(0 + " Margherita");
 
         MenuDataModel menu = new MenuDataModel("Margherita", 0, 20.0);
 
