@@ -22,29 +22,29 @@ import java.util.stream.Collectors;
 
 public class OrdersGUIController {
     @FXML
-    protected ComboBox<Integer> orderQuantity;
+    public ComboBox<Integer> orderQuantity;
     @FXML
-    protected TableView orderTable;
+    public TableView orderTable;
     @FXML
-    protected TableColumn tableQuantity;
+    public TableColumn tableQuantity;
     @FXML
-    protected TableColumn tableMenuItem;
+    public TableColumn tableMenuItem;
     @FXML
-    protected TableColumn tablePrice;
+    public TableColumn tablePrice;
     @FXML
-    protected Label pizzaTypeLabel;
+    public Label pizzaTypeLabel;
     @FXML
-    protected Button addToOrder;
+    public Button addToOrder;
     @FXML
-    protected Label orderStatus;
+    public Label orderStatus;
     @FXML
-    protected Button placeOrder;
+    public Button placeOrder;
     @FXML
-    protected Button orderServed;
+    public Button orderServed;
     @FXML
-    protected Button payOrder;
+    public Button payOrder;
     @FXML
-    protected Button newOrder;
+    public Button newOrder;
 
     private ObservableList<String> orderList = FXCollections.observableArrayList();
     private List<Double> orderPaymentList = FXCollections.observableArrayList();
@@ -59,13 +59,13 @@ public class OrdersGUIController {
     private int tableNumber;
 
     public ObservableList<String> observableList;
-    private TableView<MenuDataModel> table = new TableView<MenuDataModel>();
-    private ObservableList<MenuDataModel> menuData;// = FXCollections.observableArrayList();
+    private TableView<MenuDataModel> table;
+    public ObservableList<MenuDataModel> menuData;// = FXCollections.observableArrayList();
     private Calendar now = Calendar.getInstance();
     private static double totalAmount = 0;
 
     private MenuDataModel selectedValue;
-    protected final List<String> orderSummary = new ArrayList<>();
+    public final List<String> orderSummary = new ArrayList<>();
 
     public OrdersGUIController(){ }
 
@@ -145,7 +145,9 @@ public class OrdersGUIController {
         KitchenGUIController.order.add(formattedOrder);
         orderSummary.addAll(order);
         System.out.println(orderSummary);
-        orderStatus.setText("Order placed at: " + now.get(Calendar.HOUR) + ":" + now.get(Calendar.MINUTE));
+        if(orderStatus != null) {
+            orderStatus.setText("Order placed at: " + now.get(Calendar.HOUR) + ":" + now.get(Calendar.MINUTE));
+        }
 
         orderPaymentList= menuData.stream()
                 .filter(x -> x.getQuantity()>0)
@@ -159,6 +161,10 @@ public class OrdersGUIController {
     }
 
     public void initialize(){
+
+        if (table == null) {
+            table = new TableView<>();
+        }
 
         //populate table view with menuData from OrderGUI
         table.setEditable(true);
